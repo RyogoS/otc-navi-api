@@ -5,7 +5,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   
   // CORSを有効化　受付ルール設定
-  app.enableCors();
+  app.enableCors({
+    origin: 'http://localhost:5173',
+  });
 
   // 開店
   await app.listen(process.env.PORT ?? 3000);
