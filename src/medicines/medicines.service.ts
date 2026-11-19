@@ -29,8 +29,12 @@ export class MedicinesService {
 
   // 登録されているお薬データをとってくる処理（「symptom」で特定の症状に効く薬だけ絞り込むこともできるよ）
   async findAll(symptom?: string) {
-    // まずは「medicines（お薬）」という表から、データをぜんぶ選ぶ「基本の注文書（query）」を作る
-    let query = this.supabase.from('medicines').select();
+    // まずは「medicines（お薬）」という表から、一覧に必要な4つの列だけを選ぶ「基本の注文書（query）」を作る
+    // ・verified（確認済みの印）は作る人向けなので、画面側には渡さない
+    // ・用法用量や禁忌などの詳細は、薬を1つ選んだときに詳細API（これから作る）で渡す
+    let query = this.supabase
+      .from('medicines')
+      .select('id, name, category, symptoms');
 
     // もし「頭痛」や「熱」などの症状（symptom）が指定されていたら…
     if (symptom) {
