@@ -1,5 +1,5 @@
 // NestJSから「案内係（Controller）」と「お返事のルール（Get）」の道具を読み込む
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
 
 // 前につくった「お薬担当の係員さん（MedicinesService）」を読み込む
 import { MedicinesService } from './medicines.service.js';
@@ -15,5 +15,12 @@ export class MedicinesController {
   async findAll(@Query('symptom') symptom?: string) {
     // お薬担当の係員さんに「本棚からお薬データぜんぶ取ってきて！」とお願いして、その結果をそのまま返事する
     return await this.medicinesService.findAll(symptom);
+  }
+
+  // 「/medicines/1」のように、URL の後ろに背番号（id）がついたときに動く場所
+  // ParseIntPipe は、URL から届いた文字の "1" を数字の 1 に変える係（"abc" なら 400 エラーで止める）
+  @Get(':id')
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return await this.medicinesService.findOne(id);
   }
 }

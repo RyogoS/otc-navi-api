@@ -53,4 +53,29 @@ export class MedicinesService {
     // 無事にデータがとれたら、お薬の一覧データを返す
     return data;
   }
+
+  // 背番号（id）を指定して、お薬1つの詳細と成分をとってくる処理
+  async findOne(id: number) {
+    const { data, error } = await this.supabase
+      .from('medicines')
+      // 詳細に必要な列を選ぶ（verified は作る人向けなので、ここでも渡さない）
+      // medicine_ingredients(...) の部分は「この薬につながる中間テーブルの行も一緒に持ってきて」という意味
+      // さらにその中の ingredients(...) で「その行が指している成分の名前・役割・説明も持ってきて」とたどる
+      .select(
+        `id, name, category, symptoms,
+         precautions, contraindications, dosage_instructions,
+         pregnancy_safe, min_age, risk_class,
+         medicine_ingredients ( amount, ingredients ( name, role, description ) )`,
+      )
+      // 背番号が id と同じ薬だけに絞る
+      .eq('id', id)
+      // 1件だけ受け取る（見つからなければ null。404 にするのは次のステップ）
+      .maybeSingle();
+
+    if (error) {
+      throw error;
+    }
+
+    return data;
+  }
 }
